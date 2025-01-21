@@ -1,22 +1,19 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER app
 WORKDIR /app
 
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/API/API.csproj", "API/"]
-COPY ["src/Application/Application.csproj", "Application/"]
-COPY ["src/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
-COPY ["src/Domain/Domain.csproj", "Domain/"]
-RUN dotnet restore "API/API.csproj"
+COPY ["src/API.csproj", "."]
+RUN dotnet restore "API.csproj"
 COPY . ../
-WORKDIR "/src/API"
+WORKDIR "/src/"
 RUN dotnet build "API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-RUN dotnet publish --no-restore -c Release -o /app/publish
+RUN dotnet publish --no-restore -c $BUILD_CONFIGURATION -o /app/publish
 
 FROM base AS final
 WORKDIR /app

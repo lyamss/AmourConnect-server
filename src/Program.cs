@@ -1,17 +1,18 @@
 using Infrastructure.Extensions;
 using Infrastructure.Interfaces;
 using API.Filters;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Application.Extensions;
-using Domain.Utils;
+using API.Services;
 using StackExchange.Redis;
 
-Env.Load();
-Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("EnvSecret.json", optional: false, reloadOnChange: true);
+builder.Services.Configure<SecretEnv>(builder.Configuration.GetSection("EnvSecret"));
+var envSecret = builder.Configuration.GetSection("EnvSecret").Get<SecretEnv>();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -21,7 +22,7 @@ builder.Services.AddCaseControllers();
 
 builder.Services.AddServicesControllers();
 
-builder.Services.AddInfrastructure(Env.GetString("ConnexionDB"), Env.GetString("ConnexionRedis"));
+builder.Services.AddInfrastructure(envSecret.ConnexionDb, envSecret.ConnexionRedis);
 
 builder.Services.AddScoped<AuthorizeAuth>();
 
@@ -29,7 +30,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "web_site_Front", configurePolicy: policyBuilder =>
     {
-        policyBuilder.WithOrigins(Env.GetString("IP_NOW_FRONTEND"));
+        policyBuilder.WithOrigins(envSecret.IpFrontend);
         policyBuilder.WithHeaders("Content-Type");
         policyBuilder.WithMethods("GET", "POST", "PATCH");
         policyBuilder.AllowCredentials();
@@ -37,7 +38,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -47,28 +47,17 @@ builder.Services.AddAuthentication(options =>
 .AddCookie()
 .AddGoogle(options =>
 {
-    options.ClientId = Env.GetString("ClientId");
-    options.ClientSecret = Env.GetString("ClientSecret");
+    options.ClientId = envSecret.OAuthGoogleClientId;
+    options.ClientSecret = envSecret.OAuthGoogleClientSecret;
     options.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
     {
         OnRemoteFailure = context =>
         {
-            context.Response.Redirect(Env.GetString("IP_NOW_FRONTEND") + "/login");
+            context.Response.Redirect(envSecret.IpFrontend + "/login");
             context.HandleResponse();
             return Task.CompletedTask;
         }
     };
-});
-
-builder.Services.Configure<SecretEnv>(options =>
-{
-    options.Ip_Now_Frontend = Env.GetString("IP_NOW_FRONTEND");
-    options.Ip_Now_Backend = Env.GetString("IP_NOW_BACKENDAPI");
-    options.SecretKeyJWT = Env.GetString("SecretKeyJWT");
-    options.EMAIL_MDP = Env.GetString("EMAIL_MDP");
-    options.EMAIL_USER = Env.GetString("EMAIL_USER");
-    options.PORT_SMTP = Env.GetString("PORT_SMTP");
-    options.SERVICE = Env.GetString("SERVICE");
 });
 
 var app = builder.Build();
@@ -78,7 +67,7 @@ using (var scope = app.Services.CreateScope())
     var dataContext = scope.ServiceProvider.GetRequiredService<IBackendDbContext>();
     dataContext.Migrate();
 
-    var cacheDB = ConnectionMultiplexer.Connect(Env.GetString("ConnexionRedis"));
+    var cacheDB = ConnectionMultiplexer.Connect(envSecret.ConnexionRedis);
     if (!cacheDB.IsConnected)
     {
         Console.WriteLine("Failed to connect to CacheDB, Exiting API :/");
@@ -88,8 +77,6 @@ using (var scope = app.Services.CreateScope())
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
     using var scope = app.Services.CreateScope();
     var seeder = scope.ServiceProvider.GetRequiredService<IUserSeeder>();
     await seeder.Seed();
