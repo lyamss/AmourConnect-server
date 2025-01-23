@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Application.Services;
+using API.Services;
 
-namespace Tests.Application.ServicesTests.MessTests;
+
+namespace Tests.ServicesTests.MessTests;
 public class ImageConverterTests
 {
     [Fact]

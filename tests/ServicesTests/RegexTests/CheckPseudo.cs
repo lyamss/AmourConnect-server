@@ -1,6 +1,7 @@
-﻿using Application.Services;
+﻿using API.Services;
 
-namespace Tests.Application.ServicesTests.RegexTests
+
+namespace Tests.ServicesTests.RegexTests
 {
     public class CheckPseudo
     {
