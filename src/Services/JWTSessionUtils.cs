@@ -4,21 +4,22 @@ using System.Text;
 using System.Security.Claims;
 using API.Features.Authentification.Dtos;
 using API.Entities;
+using Microsoft.Extensions.Options;
 
 
 
 
 namespace API.Services
 {
-    internal sealed class JWTSessionUtils(SecretEnv jwtSecret, IHttpContextAccessor httpContextAccessor, IRepository<User> repositoryU) : IJWTSessionUtils
+    internal sealed class JWTSessionUtils(IOptions<SecretEnv> jwtSecret, IHttpContextAccessor httpContextAccessor, IRepository<User> repositoryU) : IJWTSessionUtils
     {
         public string NameCookieUserConnected { get; } = "User-AmourConnect";
         public string NameCookieUserGoogle { get; } = "GoogleUser-AmourConnect";
 
 
-        private readonly SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(jwtSecret.SecretKeyJWT));
-        private readonly string ip_Now_Frontend = jwtSecret.IpFrontend;
-        private readonly string ip_Now_Backend = jwtSecret.IP_Backend;
+        private readonly SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(jwtSecret.Value.SecretKeyJWT));
+        private readonly string ip_Now_Frontend = jwtSecret.Value.IpFrontend;
+        private readonly string ip_Now_Backend = jwtSecret.Value.IP_Backend;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IRepository<User> _repositoryU = repositoryU;
 

@@ -1,6 +1,7 @@
 using API.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 
 namespace API.Features.Authentification;
@@ -8,15 +9,14 @@ namespace API.Features.Authentification;
 
 
 [Route("api/v1/[controller]")]
-[MiddlewareExceptionCancellationToken]
 public partial class Authentification : ControllerBase
 {
-    private readonly SecretEnv secretEnv;
+    private readonly IOptions<SecretEnv> secretEnv;
     private readonly IMediator mediator;
 
     public Authentification
     (
-        SecretEnv secretEnv,
+        IOptions<SecretEnv> secretEnv,
         IMediator mediator
     )
     {

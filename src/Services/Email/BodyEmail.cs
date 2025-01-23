@@ -1,13 +1,14 @@
 ﻿using API.Entities;
+using Microsoft.Extensions.Options;
 
 
 
 namespace API.Services.Email
 {
-    public class BodyEmail(SecretEnv SecretEnv) : IBodyEmail
+    public class BodyEmail(IOptions<SecretEnv> SecretEnv) : IBodyEmail
     {
-        private readonly string _requestUrlPageRequest = $"{SecretEnv.IP_Backend}/request";
-        private readonly string _requestUrlWebSite = $"{SecretEnv.IP_Backend}";
+        private readonly string _requestUrlPageRequest = $"{SecretEnv.Value.IP_Backend}/request";
+        private readonly string _requestUrlWebSite = $"{SecretEnv.Value.IP_Backend}";
         public string subjectRegister
         {
             get { return "Bienvenu chez AmourConnect ❤️"; }

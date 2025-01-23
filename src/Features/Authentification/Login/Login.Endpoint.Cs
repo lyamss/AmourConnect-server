@@ -9,5 +9,5 @@ namespace API.Features.Authentification;
 public partial class Authentification
 {
         [HttpGet("login")]
-        public IActionResult Login() => this.Challenge(new AuthenticationProperties { RedirectUri = this.secretEnv.IP_Backend + "/api/Auth/signin-google" }, GoogleDefaults.AuthenticationScheme);
+        public IActionResult Login() => this.Challenge(new AuthenticationProperties { RedirectUri = this.secretEnv.Value.IP_Backend + "/api/v1/Authentification/signin-google" }, GoogleDefaults.AuthenticationScheme);
 }

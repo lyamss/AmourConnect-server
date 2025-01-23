@@ -10,7 +10,6 @@ using API.Features.RequestFriend;
 namespace API.Features.Message
 {
     [Route("api/v1/[controller]")]
-    [MiddlewareExceptionCancellationToken]
     [ServiceFilter(typeof(AuthorizeAuth))]
     public class MessageController
     (
@@ -23,7 +22,6 @@ namespace API.Features.Message
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IRequestFriendsRepository _requestFriendsRepository = RequestFriendsRepository;
         private readonly IMessageRepository _messageRepository = MessageRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly string token_session_user = jWTSessionUtils.GetValueClaimsCookieUser(httpContextAccessor.HttpContext);
         private readonly IRegexUtils _regexUtils = regexUtils;
         private readonly IRepository<Entities.Message> _repositoryM = repositoryM;

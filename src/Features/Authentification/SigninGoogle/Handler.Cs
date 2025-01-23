@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using MediatR;
 using API.Features.Users;
 using API.Services;
-using API.Services.Email;
+using Microsoft.Extensions.Options;
 
 
 
@@ -12,14 +12,12 @@ namespace API.Features.Authentification.SigninGoogle
 {
     internal sealed class Handler
     (IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, 
-    IRegexUtils regexUtils, ISendMail sendMail, IJWTSessionUtils jWTSessionUtils
-    , SecretEnv SecretEnv) 
+    IJWTSessionUtils jWTSessionUtils
+    , IOptions<SecretEnv> SecretEnv) 
     : IRequestHandler<Query, ApiResponseDto>
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-        private readonly IRegexUtils _regexUtils = regexUtils;
-        private readonly ISendMail sendMail = sendMail;
         private readonly IJWTSessionUtils _jWTSessions = jWTSessionUtils;
 
         public async Task<ApiResponseDto> Handle(Query query, CancellationToken cancellationToken)
@@ -28,7 +26,7 @@ namespace API.Features.Authentification.SigninGoogle
             
             if (response?.Principal == null || !response.Succeeded)
             {
-                return ApiResponseDto.Failure( SecretEnv.IpFrontend + "/login");
+                return ApiResponseDto.Failure( SecretEnv.Value.IpFrontend + "/login");
             }
 
             var EmailGoogle = response.Principal.FindFirstValue(ClaimTypes.Email);
@@ -36,19 +34,19 @@ namespace API.Features.Authentification.SigninGoogle
 
             if (string.IsNullOrEmpty(EmailGoogle) || string.IsNullOrEmpty(userIdGoogle))
             {
-                return ApiResponseDto.Failure(SecretEnv.IpFrontend + "/login");
+                return ApiResponseDto.Failure(SecretEnv.Value.IpFrontend + "/login");
             }
 
             var Id_User = await this._userRepository.GetUserIdWithGoogleIdAsync(EmailGoogle, userIdGoogle, cancellationToken);
 
-            if (Id_User.Id_User > 0)
+            if (Id_User is not null)
             {
                 await this._jWTSessions.CreateSessionLoginAsync(Id_User, cancellationToken);
-                return ApiResponseDto.Success(SecretEnv.IpFrontend + "/welcome", null);
+                return ApiResponseDto.Success(SecretEnv.Value.IpFrontend + "/welcome", null);
             }
 
             this._jWTSessions.SetCookieToSaveIdGoogle(this._httpContextAccessor.HttpContext.Response, userIdGoogle, EmailGoogle);
-            return ApiResponseDto.Failure(SecretEnv.IpFrontend + "/register");
+            return ApiResponseDto.Failure(SecretEnv.Value.IpFrontend + "/register");
         }
     }
 }

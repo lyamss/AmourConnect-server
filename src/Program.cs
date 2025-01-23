@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using API.Services;
 using StackExchange.Redis;
-using API.Features.Authentification.Filters;
 using API.Persistence;
 using API.Seeders;
 using API.Extensions;
@@ -19,8 +18,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 
 builder.Services.AddInfrastructure(envSecret.ConnexionDb, envSecret.ConnexionRedis);
-
-builder.Services.AddScoped<AuthorizeAuth>();
 
 builder.Services.AddCors(options =>
 {

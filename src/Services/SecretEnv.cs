@@ -2,7 +2,7 @@
 
 namespace API.Services
 {
-    public record SecretEnv
+    public sealed record SecretEnv
     {
         [Required]
         public string SecretKeyJWT { get; init; }

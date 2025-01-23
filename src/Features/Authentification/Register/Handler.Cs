@@ -6,7 +6,7 @@ using MediatR;
 
 namespace API.Features.Authentification.Register;
 
-internal sealed class Handler : IRequestHandler<CommandRegister , ApiResponseDto>
+internal sealed class RegisterHandler : IRequestHandler<CommandRegister , ApiResponseDto>
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IJWTSessionUtils _jWTSessionUtils;
@@ -15,7 +15,7 @@ internal sealed class Handler : IRequestHandler<CommandRegister , ApiResponseDto
     private readonly IRepository<User> _repositoryU;
     private readonly ISendMail _sendMail;
 
-    public Handler
+    public RegisterHandler
     (
         IHttpContextAccessor httpContextAccessor,
         IJWTSessionUtils jWTSessionUtils,
@@ -65,7 +65,7 @@ internal sealed class Handler : IRequestHandler<CommandRegister , ApiResponseDto
             User userGet = await this._userRepository.GetUserIdWithGoogleIdAsync(emailGoogle, userIdGoogle, cancellationToken);
 
 
-            if (userGet.Id_User > 0)
+            if (userGet is not null)
             {
                 await this._jWTSessionUtils.CreateSessionLoginAsync(userGet, cancellationToken);
                 return ApiResponseDto.Success("User already exists, logged in", null);

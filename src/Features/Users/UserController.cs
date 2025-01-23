@@ -1,18 +1,15 @@
 ﻿using API.Entities;
 using API.Features.Authentification.Filters;
 using API.Services;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace API.Features.Users
 {
     [Route("api/v1/[controller]")]
-    [MiddlewareExceptionCancellationToken]
     [ServiceFilter(typeof(AuthorizeAuth))]
     public class UserController
     (
-    IMediator mediator,
     IUserRepository userRepository,
     IHttpContextAccessor httpContextAccessor,
     IJWTSessionUtils jWTSessionUtils,
@@ -22,9 +19,7 @@ namespace API.Features.Users
     ) 
     : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly string token_session_user = jWTSessionUtils.GetValueClaimsCookieUser(httpContextAccessor.HttpContext);
         private readonly IRegexUtils _regexUtils = regexUtils;
         private readonly IMessUtils _messUtils = messUtils;

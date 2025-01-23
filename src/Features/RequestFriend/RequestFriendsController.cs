@@ -10,7 +10,6 @@ using API.Entities;
 namespace API.Features.RequestFriend
 {
     [Route("api/v1/[controller]")]
-    [MiddlewareExceptionCancellationToken]
     [ServiceFilter(typeof(AuthorizeAuth))]
     public class RequestFriendsController
     (
@@ -22,7 +21,6 @@ namespace API.Features.RequestFriend
 
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IRequestFriendsRepository _requestFriendsRepository = requestFriendsRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly string token_session_user = jWTSessionUtils.GetValueClaimsCookieUser(httpContextAccessor.HttpContext);
         private readonly ISendMail sendMail = sendMail;
         private readonly IRepository<RequestFriends> _repositoryR = repositoryR;
