@@ -5,6 +5,7 @@ using StackExchange.Redis;
 using API.Persistence;
 using API.Seeders;
 using API.Extensions;
+using API.Features.Message;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ builder.Services.Configure<SecretEnv>(builder.Configuration.GetSection("EnvSecre
 var envSecret = builder.Configuration.GetSection("EnvSecret").Get<SecretEnv>();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
 
@@ -82,5 +85,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseCors("web_site_Front");
+
+//app.MapHub<ChatHub>("/chatHub");
 
 await app.RunAsync();
