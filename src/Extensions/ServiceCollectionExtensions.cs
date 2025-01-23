@@ -1,4 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using API.Features.Message;
+using API.Features.RequestFriend;
+using API.Features.Users;
+using API.Persistence;
+using API.Seeders;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Extensions
 {
@@ -21,10 +26,6 @@ namespace API.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IRequestFriendsRepository, RequestFriendsRepository>();
-            services.AddScoped<IUserCaching, UserCaching>();
-            services.AddScoped<IRequestFriendsCaching, RequestFriendsCaching>();
-            services.AddScoped<IMessageCaching, MessageCaching>();
-            services.AddTransient<ICacheService, CacheService>();
         }
     }
 }

@@ -3,23 +3,23 @@ using API.Features.Authentification.Filters;
 using API.Features.Users;
 using API.Services;
 using API.Entities;
+using API.Features.RequestFriend;
 
 
 
 namespace API.Features.Message
 {
     [Route("api/v1/[controller]")]
+    [MiddlewareExceptionCancellationToken]
     [ServiceFilter(typeof(AuthorizeAuth))]
     public class MessageController
     (
         IUserRepository userRepository, IRequestFriendsRepository RequestFriendsRepository, IMessageRepository MessageRepository, 
         IHttpContextAccessor httpContextAccessor, IRegexUtils regexUtils, IJWTSessionUtils jWTSessionUtils,
-        IMessageRepository messageRepository,
         IRepository<Entities.Message> repositoryM
     ) 
     : ControllerBase
     {
-
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IRequestFriendsRepository _requestFriendsRepository = RequestFriendsRepository;
         private readonly IMessageRepository _messageRepository = MessageRepository;
@@ -38,7 +38,7 @@ namespace API.Features.Message
  
            User dataUserNowConnect = await this._GetDataUserConnected(token_session_user, cancellationToken);
 
-            RequestFriendForGetMessageDto existingRequest = await _requestFriendsRepository.GetRequestFriendByIdAsync(dataUserNowConnect.Id_User, setmessageDto.IdUserReceiver);
+            RequestFriendForGetMessageDto existingRequest = await _requestFriendsRepository.GetRequestFriendByIdAsync(dataUserNowConnect.Id_User, commandMessage.IdUserReceiver, cancellationToken);
 
             if (existingRequest != null)
             {
@@ -47,7 +47,7 @@ namespace API.Features.Message
                     return this.Conflict(ApiResponseDto.Failure("There must be validation of the match request to chat"));
                 }
 
-                if (!_regexUtils.CheckMessage(setmessageDto.MessageContent))
+                if (!_regexUtils.CheckMessage(commandMessage.MessageContent))
                 {
                     return this.BadRequest(ApiResponseDto.Failure("Message no valid"));
                 }
@@ -55,8 +55,8 @@ namespace API.Features.Message
                 var message = new Entities.Message
                 {
                     IdUserIssuer = dataUserNowConnect.Id_User,
-                    Id_UserReceiver = setmessageDto.IdUserReceiver,
-                    message_content = setmessageDto.MessageContent,
+                    Id_UserReceiver = commandMessage.IdUserReceiver,
+                    message_content = commandMessage.MessageContent,
                     Date_of_request = DateTime.Now.ToUniversalTime(),
                 };
 
@@ -79,7 +79,7 @@ namespace API.Features.Message
 
             User dataUserNowConnect = await this._GetDataUserConnected(token_session_user, cancellationToken);
 
-            RequestFriendForGetMessageDto existingRequest = await _requestFriendsCaching.GetRequestFriendByIdAsync(dataUserNowConnect.Id_User, Id_UserReceiver);
+            RequestFriendForGetMessageDto existingRequest = await this._requestFriendsRepository.GetRequestFriendByIdAsync(dataUserNowConnect.Id_User, Id_UserReceiver, cancellationToken);
 
             if (existingRequest != null)
             {

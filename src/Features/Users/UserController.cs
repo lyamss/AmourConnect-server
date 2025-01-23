@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Features.Users
 {
     [Route("api/v1/[controller]")]
+    [MiddlewareExceptionCancellationToken]
     [ServiceFilter(typeof(AuthorizeAuth))]
     public class UserController
     (

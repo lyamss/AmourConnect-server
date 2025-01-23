@@ -10,12 +10,12 @@ using API.Entities;
 namespace API.Features.RequestFriend
 {
     [Route("api/v1/[controller]")]
-    [ApiController]
+    [MiddlewareExceptionCancellationToken]
     [ServiceFilter(typeof(AuthorizeAuth))]
     public class RequestFriendsController
     (
     IUserRepository userRepository, IRequestFriendsRepository requestFriendsRepository, IHttpContextAccessor httpContextAccessor, 
-    ISendMail sendMail, IJWTSessionUtils jWTSessionUtils
+    ISendMail sendMail, IJWTSessionUtils jWTSessionUtils, IRepository<RequestFriends> repositoryR
     ) : ControllerBase
     {
 
@@ -25,6 +25,7 @@ namespace API.Features.RequestFriend
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly string token_session_user = jWTSessionUtils.GetValueClaimsCookieUser(httpContextAccessor.HttpContext);
         private readonly ISendMail sendMail = sendMail;
+        private readonly IRepository<RequestFriends> _repositoryR = repositoryR;
         private async Task<User> _GetDataUserConnected(string token_session_user, CancellationToken cancellationToken) => await this._userRepository.GetUserWithCookieAsync(token_session_user, cancellationToken);
 
 
@@ -49,46 +50,82 @@ namespace API.Features.RequestFriend
 
             requestFriends = filteredRequestFriends;
 
-            throw new ExceptionAPI(true, "Request friends retrieved successfully", requestFriends);
+            return this.Ok(ApiResponseDto.Success("Request friends retrieved successfully", requestFriends));
         }
 
 
 
         [HttpPost("AddRequest/{IdUserReceiver}")]
-        public async Task<IActionResult> RequestFriends([FromRoute] int IdUserReceiver)
+        public async Task<IActionResult> RequestFriends([FromRoute] int IdUserReceiver, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!this.ModelState.IsValid)
+                return this.BadRequest(this.ModelState);
 
-            ApiResponseDto<string> _responseApi = null;
+            User dataUserNowConnect = await this._GetDataUserConnected(token_session_user, cancellationToken);
 
-            try { await _requestFriendsUseCase.AddRequestFriendsAsync(IdUserReceiver); }
+            User userReceiver = await this._userRepository.GetUserByIdUserAsync(IdUserReceiver, cancellationToken);
 
-            catch (ExceptionAPI e) { var objt = e.ManageApiMessage<string>(); _responseApi = objt; }
+            if (userReceiver == null)
+            {
+                return this.BadRequest(ApiResponseDto.Failure("User receiver does not exist"));
+            }
 
-            return _responseApi.Message == "User receiver does not exist"
-            ? BadRequest(_responseApi)
-            : _responseApi.Success
-                ? Ok(_responseApi)
-                : Conflict(_responseApi);
+            if (dataUserNowConnect.Id_User == userReceiver.Id_User)
+            {
+                return this.Conflict(ApiResponseDto.Failure("User cannot send a match request to themselves"));
+            }
+
+            RequestFriendForGetMessageDto existingRequest = await this._requestFriendsRepository.GetRequestFriendByIdAsync(dataUserNowConnect.Id_User, IdUserReceiver, cancellationToken);
+
+            if (existingRequest != null)
+            {
+                if (existingRequest.Status == RequestStatus.Onhold)
+                {
+                    return this.Conflict(ApiResponseDto.Failure("A match request is already pending between these users"));
+                }
+
+                return this.Conflict(ApiResponseDto.Failure("You have already matched with this user"));
+            }
+
+            RequestFriends requestFriends = new()
+            {
+                UserIssuer = dataUserNowConnect,
+                UserReceiver = userReceiver,
+                Status = RequestStatus.Onhold,
+                Date_of_request = DateTime.Now.ToUniversalTime()
+            };
+
+            await this._repositoryR.AddAsync(requestFriends, cancellationToken);
+            await this._repositoryR.SaveChangesAsync(cancellationToken);
+
+            await sendMail.RequestFriendMailAsync(userReceiver, dataUserNowConnect);
+
+            return this.Ok(ApiResponseDto.Success("Your match request has been made successfully 💕", null));
         }
 
 
         [HttpPatch("AcceptRequestFriends/{IdUserIssuer}")]
-        public async Task<IActionResult> AcceptFriendRequest([FromRoute] int IdUserIssuer)
+        public async Task<IActionResult> AcceptFriendRequest([FromRoute] int IdUserIssuer, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!this.ModelState.IsValid)
+                return this.BadRequest(this.ModelState);
 
-            ApiResponseDto<string> _responseApi = null;
+            User dataUserNowConnect = await this._GetDataUserConnected(token_session_user, cancellationToken);
 
-            try { await _requestFriendsUseCase.AcceptFriendRequestAsync(IdUserIssuer); }
+            RequestFriends friendRequest = await this._requestFriendsRepository.GetUserFriendRequestByIdAsync(dataUserNowConnect.Id_User, IdUserIssuer, cancellationToken);
 
-            catch (ExceptionAPI e) { var objt = e.ManageApiMessage<string>(); _responseApi = objt; }
+            if (friendRequest == null)
+            {
+                return  this.NotFound(ApiResponseDto.Failure("Match request not found"));
+            }
 
-            return _responseApi.Success
-            ? Ok(_responseApi)
-            : NotFound(_responseApi);
+            friendRequest.Status = RequestStatus.Accepted;
+
+            await _repositoryR.SaveChangesAsync(cancellationToken);
+
+            await sendMail.AcceptRequestFriendMailAsync(friendRequest.UserIssuer, dataUserNowConnect);
+
+            return this.Ok(ApiResponseDto.Success("Request match accepted", null));
         }
     }
 }

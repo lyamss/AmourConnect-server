@@ -12,19 +12,19 @@ namespace API.Features.RequestFriend
             }
 
             return new QueryRequestFriend
-            (
-                requestFriends.Id_RequestFriends,
-                requestFriends.Status,
-                requestFriends.Date_of_request,
-                requestFriends.Id_UserReceiver,
-                requestFriends.IdUserIssuer,
-                requestFriends.UserReceiver.Pseudo,
-                requestFriends.UserIssuer.Pseudo,
-                requestFriends.UserIssuer.Profile_picture,
-                requestFriends.UserReceiver.Profile_picture,
-                requestFriends.UserReceiver.sex,
-                requestFriends.UserIssuer.sex
-            );
+            {
+                Id_RequestFriends = requestFriends.Id_RequestFriends,
+                IdUserIssuer = requestFriends.IdUserIssuer,
+                UserIssuerPseudo = requestFriends.UserIssuer.Pseudo,
+                Id_UserReceiver = requestFriends.Id_UserReceiver,
+                UserReceiverPseudo = requestFriends.UserReceiver.Pseudo,
+                Status = requestFriends.Status,
+                Date_of_request = requestFriends.Date_of_request,
+                UserIssuerPictureProfile = requestFriends.UserIssuer.Profile_picture,
+                UserReceiverPictureProfile = requestFriends.UserReceiver.Profile_picture,
+                UserIssuerSex = requestFriends.UserIssuer.sex,
+                UserReceiverSex = requestFriends.UserReceiver.sex,
+            };
         }
 
         public static RequestFriendForGetMessageDto ToGetRequestFriendsForGetMessageMapper(this RequestFriends requestFriends)

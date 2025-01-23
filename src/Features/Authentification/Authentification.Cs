@@ -8,6 +8,7 @@ namespace API.Features.Authentification;
 
 
 [Route("api/v1/[controller]")]
+[MiddlewareExceptionCancellationToken]
 public partial class Authentification : ControllerBase
 {
     private readonly SecretEnv secretEnv;
