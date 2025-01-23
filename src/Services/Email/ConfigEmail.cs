@@ -1,25 +1,24 @@
 ﻿using System.Net.Mail;
-using Application.Interfaces.Services.Email;
-using Domain.Utils;
-using Microsoft.Extensions.Options;
-namespace Application.Services.Email
+
+
+namespace API.Services.Email
 {
-    public class ConfigEmail(IOptions<SecretEnv> SecretEnv) : IConfigEmail
+    internal class ConfigEmail(SecretEnv SecretEnv) : IConfigEmail
     {
         public async Task configMail(string toEmail, string subject, string body)
         {
             MailMessage mail = new();
 
-            SmtpClient smtpClient = new(SecretEnv.Value.SERVICE);
+            SmtpClient smtpClient = new(SecretEnv.SERVICE_SMTP);
 
-            mail.From = new MailAddress(SecretEnv.Value.EMAIL_USER);
+            mail.From = new MailAddress(SecretEnv.EMAIL_USER_SMTP);
             mail.To.Add(toEmail);
             mail.Subject = subject;
             mail.Body = body;
             mail.IsBodyHtml = true;
 
-            smtpClient.Port = int.Parse(SecretEnv.Value.PORT_SMTP);
-            smtpClient.Credentials = new System.Net.NetworkCredential(SecretEnv.Value.EMAIL_USER, SecretEnv.Value.EMAIL_MDP);
+            smtpClient.Port = int.Parse(SecretEnv.PORT_SMTP);
+            smtpClient.Credentials = new System.Net.NetworkCredential(SecretEnv.EMAIL_USER_SMTP, SecretEnv.EMAIL_MDP_SMTP);
             smtpClient.EnableSsl = true;
 
             try
@@ -31,5 +30,11 @@ namespace Application.Services.Email
                 Console.WriteLine($"Failed to send email to {toEmail}: {ex.Message}");
             }
         }
+    }
+
+
+    internal interface IConfigEmail
+    {
+        Task configMail(string toEmail, string subject, string body);
     }
 }

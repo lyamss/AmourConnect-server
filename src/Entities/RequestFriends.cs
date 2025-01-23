@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Entities
+namespace API.Entities
 {
     public class RequestFriends
     {

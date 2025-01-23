@@ -1,13 +1,13 @@
-﻿using Domain.Entities;
-using Application.Interfaces.Services.Email;
-using Domain.Utils;
-using Microsoft.Extensions.Options;
-namespace Application.Services.Email
+﻿using API.Entities;
+
+
+
+namespace API.Services.Email
 {
-    public class BodyEmail(IOptions<SecretEnv> SecretEnv) : IBodyEmail
+    public class BodyEmail(SecretEnv SecretEnv) : IBodyEmail
     {
-        private readonly string _requestUrlPageRequest = $"{SecretEnv.Value.Ip_Now_Frontend}/request";
-        private readonly string _requestUrlWebSite = $"{SecretEnv.Value.Ip_Now_Frontend}";
+        private readonly string _requestUrlPageRequest = $"{SecretEnv.IP_Backend}/request";
+        private readonly string _requestUrlWebSite = $"{SecretEnv.IP_Backend}";
         public string subjectRegister
         {
             get { return "Bienvenu chez AmourConnect ❤️"; }
@@ -184,5 +184,17 @@ namespace Application.Services.Email
     </body>
     </html>
     ";
+    }
+
+
+    internal interface IBodyEmail
+    {
+        string _acceptFriendBodyEmail(string pseudoReceiver, User dataUserIssuer);
+        string _requestFriendBodyEmail(string pseudoReceiver, User dataUserIssuer);
+        string _emailBodyRegister(string pseudo);
+
+        public string subjectAcceptFriend { get; }
+        public string subjectRequestFriend { get; }
+        public string subjectRegister { get; }
     }
 }

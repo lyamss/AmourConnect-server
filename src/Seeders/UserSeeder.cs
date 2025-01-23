@@ -1,8 +1,7 @@
-﻿using Domain.Entities;
-using Infrastructure.Interfaces;
-using Infrastructure.Persistence;
+﻿using API.Entities;
+using API.Persistence;
 
-namespace Infrastructure.Seeders
+namespace API.Seeders
 {
     internal sealed class UserSeeder(BackendDbContext context) : IUserSeeder
     {
@@ -17,12 +16,12 @@ namespace Infrastructure.Seeders
                     {
                         User newUser = new()
                         {
-                            Pseudo = _GenerateRandomName(),
-                            Description = _GenerateRandomName() + _GenerateRandomPassword(),
-                            EmailGoogle = _GenerateRandomEmail(),
-                            userIdGoogle = _GenerateRandomPassword(),
-                            city = _GenerateRandomCity(),
-                            sex = _GenerateRandomGender(),
+                            Pseudo = this._GenerateRandomName(),
+                            Description = this._GenerateRandomName() + this._GenerateRandomPassword(),
+                            EmailGoogle = this._GenerateRandomEmail(),
+                            userIdGoogle = this._GenerateRandomPassword(),
+                            city = this._GenerateRandomCity(),
+                            sex = this._GenerateRandomGender(),
                             date_of_birth = DateTime.UtcNow.AddYears(-random.Next(18, 65)),
                             account_created_at = DateTime.UtcNow
                         };
@@ -43,7 +42,7 @@ namespace Infrastructure.Seeders
         {
             string[] domains = { "gmail.com", "yahoo.com", "hotmail.com", "outlook.com" };
             Random rand = new();
-            return $"{_GenerateRandomName().ToLower()}@{domains[rand.Next(domains.Length)]}";
+            return $"{this._GenerateRandomName().ToLower()}@{domains[rand.Next(domains.Length)]}";
         }
 
         private string _GenerateRandomPassword()

@@ -1,7 +1,4 @@
-﻿using Application.Interfaces.Services;
-using Microsoft.AspNetCore.Http;
-
-namespace Application.Services
+﻿namespace API.Services
 {
     public class MessUtils : IMessUtils
     {
@@ -14,5 +11,10 @@ namespace Application.Services
             await image.CopyToAsync(memoryStream);
             return memoryStream.ToArray();
         }
+    }
+
+    public interface IMessUtils
+    {
+        Task<byte[]> ConvertImageToByteArrayAsync(IFormFile image);
     }
 }

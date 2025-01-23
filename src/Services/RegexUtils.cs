@@ -1,10 +1,12 @@
-﻿using Domain.Dtos.SetDtos;
-using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Http;
-using Application.Interfaces.Services;
-namespace Application.Services
+﻿using System.Text.RegularExpressions;
+using API.Features.Authentification.Register;
+
+
+
+
+namespace API.Services
 {
-    public class RegexUtils : IRegexUtils
+    internal class RegexUtils : IRegexUtils
     {
         private readonly Regex DateRegex = new(@"^\d{4}-\d{2}-\d{2}$", RegexOptions.Compiled); // (format : YYYY-MM-DD)
         private readonly Regex CityRegex = new(@"^[a-zA-Z\s]{2,50}$", RegexOptions.Compiled);
@@ -12,21 +14,21 @@ namespace Application.Services
         private readonly Regex MessageRegex = new(@"^.{1,200}$", RegexOptions.Compiled);
         private readonly Regex DescriptionRegex = new(@"^.{1,100}$", RegexOptions.Compiled);
 
-        public (bool success, string message) CheckBodyAuthRegister(SetUserRegistrationDto setUserRegistrationDto)
+        public (bool success, string message) CheckBodyAuthRegister(CommandRegister commandRegister)
         {
-            if (!CheckDate(setUserRegistrationDto.date_of_birth))
+            if (!this.CheckDate(commandRegister.Date_of_birth))
                 return (false, "Invalid date of birth format or length");
 
-            if (!CheckSex(setUserRegistrationDto.sex))
+            if (!this.CheckSex(commandRegister.Sex))
                 return (false, "Invalid sex value or length");
 
-            if (!CheckCity(setUserRegistrationDto.city))
+            if (!this.CheckCity(commandRegister.City))
                 return (false, "Invalid city or length");
 
-            if (!CheckPseudo(setUserRegistrationDto.Pseudo))
+            if (!this.CheckPseudo(commandRegister.Pseudo))
                 return (false, "Invalid pseudo or length");
 
-            if (!CheckDescription(setUserRegistrationDto.Description))
+            if (!this.CheckDescription(commandRegister.Description))
                 return (false, "Invalid description or length");
 
             return (true, string.Empty);
@@ -139,5 +141,18 @@ namespace Application.Services
 
             return true;
         }
+    }
+
+
+    public interface IRegexUtils
+    {
+        (bool success, string message) CheckBodyAuthRegister(CommandRegister commandRegister);
+        bool CheckPicture(IFormFile Profile_picture);
+        bool CheckCity(string city);
+        bool CheckSex(string sex);
+        bool CheckDate(DateTime? date);
+        bool CheckPseudo(string Pseudo);
+        bool CheckDescription(string Description);
+        bool CheckMessage(string Message);
     }
 }

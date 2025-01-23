@@ -1,9 +1,8 @@
-﻿using Domain.Entities;
+﻿using API.Entities;
 using Microsoft.EntityFrameworkCore;
-using Infrastructure.Interfaces;
 
 
-namespace Infrastructure.Persistence
+namespace API.Persistence
 {
     internal sealed class BackendDbContext(DbContextOptions<BackendDbContext> options) : DbContext(options), IBackendDbContext
     {
@@ -42,7 +41,15 @@ namespace Infrastructure.Persistence
 
         public void Migrate()
         {
-            Database.Migrate();
+            this.Database.Migrate();
         }
+    }
+
+
+
+
+    internal interface IBackendDbContext
+    {
+        void Migrate();
     }
 }

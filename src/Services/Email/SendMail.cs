@@ -1,9 +1,8 @@
-﻿using Application.Interfaces.Services.Email;
-using Domain.Entities;
+﻿using API.Entities;
 
-namespace Application.Services.Email
+namespace API.Services.Email
 {
-    public class SendMail(IConfigEmail cEmail, IBodyEmail bodyEmail) : ISendMail
+    internal sealed class SendMail(IConfigEmail cEmail, IBodyEmail bodyEmail) : ISendMail
     {
         private readonly IConfigEmail _cEmail = cEmail;
         private readonly IBodyEmail _bodyEmail = bodyEmail;
@@ -16,5 +15,12 @@ namespace Application.Services.Email
 
         public async Task AcceptRequestFriendMailAsync(User dataUserReceiver, User dataUserIssuer) 
         => await _cEmail.configMail(dataUserReceiver.EmailGoogle, dataUserIssuer.Pseudo + _bodyEmail.subjectAcceptFriend, _bodyEmail._acceptFriendBodyEmail(dataUserReceiver.Pseudo, dataUserIssuer));
+    }
+
+    public interface ISendMail
+    {
+        Task MailRegisterAsync(string email, string pseudo);
+        Task RequestFriendMailAsync(User dataUserReceiver, User dataUserIssuer);
+        Task AcceptRequestFriendMailAsync(User dataUserReceiver, User dataUserIssuer);
     }
 }

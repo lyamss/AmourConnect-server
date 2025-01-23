@@ -1,11 +1,11 @@
-using Infrastructure.Extensions;
-using Infrastructure.Interfaces;
-using API.Filters;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
-using Application.Extensions;
 using API.Services;
 using StackExchange.Redis;
+using API.Features.Authentification.Filters;
+using API.Persistence;
+using API.Seeders;
+using API.Extensions;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,10 +17,6 @@ var envSecret = builder.Configuration.GetSection("EnvSecret").Get<SecretEnv>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
-
-builder.Services.AddCaseControllers();
-
-builder.Services.AddServicesControllers();
 
 builder.Services.AddInfrastructure(envSecret.ConnexionDb, envSecret.ConnexionRedis);
 

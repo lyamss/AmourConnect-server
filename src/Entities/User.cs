@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Domain.Entities
+namespace API.Entities
 {
     public class User
     {
@@ -44,9 +44,9 @@ namespace Domain.Entities
         [Required]
         public DateTime account_created_at { get; set; }
 
-        public virtual ICollection<Message> MessagesSent { get; set; }
-        public virtual ICollection<Message> MessagesReceived { get; set; }
-        public virtual ICollection<RequestFriends> RequestsSent { get; set; }
-        public virtual ICollection<RequestFriends> RequestsReceived { get; set; }
+        public ICollection<Message> MessagesSent { get; set; }
+        public ICollection<Message> MessagesReceived { get; set; }
+        public ICollection<RequestFriends> RequestsSent { get; set; }
+        public ICollection<RequestFriends> RequestsReceived { get; set; }
     }
 }
