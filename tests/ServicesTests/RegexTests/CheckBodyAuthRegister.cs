@@ -1,11 +1,11 @@
-﻿using Application.Services;
-using Domain.Dtos.SetDtos;
+﻿using API.Features.Authentification.Register;
+using API.Services;
 
-namespace Tests.Application.ServicesTests.RegexTests
+
+namespace Tests.ServicesTests.RegexTests
 {
     public class CheckBodyAuthRegister
     {
-            
         private static readonly RegexUtils regexUtils = new();
 
         public static IEnumerable<object[]> newUserRegistrationTrue =>
@@ -29,14 +29,14 @@ namespace Tests.Application.ServicesTests.RegexTests
         [MemberData(nameof(newUserRegistrationTrue))]
         public void ShouldReturnNewObjectTrue(string pseudo, string description, DateTime date,string sex, string city)
         {
-            SetUserRegistrationDto newUser = new()
-            {
-                Pseudo = pseudo,
-                Description = description,
-                date_of_birth = date,
-                sex = sex,
-                city = city
-            };
+            CommandRegister newUser = new
+            (
+                pseudo,
+                description,
+                date,
+                sex,
+                city
+            );
 
 
             var (success, message) = regexUtils.CheckBodyAuthRegister(newUser);
@@ -48,14 +48,14 @@ namespace Tests.Application.ServicesTests.RegexTests
         [MemberData(nameof(newUserRegistrationFalse))]
         public void ShouldReturnNewObjectFalse(string pseudo, string description, DateTime date, string sex, string city)
         {
-            SetUserRegistrationDto newUser = new()
-            {
-                Pseudo = pseudo,
-                Description = description,
-                date_of_birth = date,
-                sex = sex,
-                city = city
-            };
+             CommandRegister newUser = new
+            (
+                pseudo,
+                description,
+                date,
+                sex,
+                city
+            );
 
             var (success, message) = regexUtils.CheckBodyAuthRegister(newUser);
 
