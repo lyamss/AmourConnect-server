@@ -14,6 +14,16 @@ The server project is written in C# using .NET Core with ASP.NET Core.
 
 ![Schema DevOps](./assets/InfraDeployementAmourConnect.drawio.png)
 
+# Schema Cache
+
+![Schema Cache](./assets/redisD.png)
+
+# I use mediatR for CQRS
+
+<p align="center">
+  <img src="./assets/mediatR.png" width="50" height="50">
+</p>
+
 # UML Class diagram
 ```mermaid
 classDiagram
@@ -87,12 +97,6 @@ You can deploy AmourConnect using Docker containers on Windows, macOS, and Linux
 ### *⛔ Start the Database And Cache first before (in the folder DataBase)*
 
 
-*If you use Docker, update the .env config =>*
-
-```
-ConnectionDB="Host=postgresdbsqlamourconnect;Port=5432;Username=tchoulo;Password=123tchoulo123;Database=amourconnect_dev;"
-```
-
 Start API .NET Core with Docker
 ```
 docker compose -f .\compose.yaml up -d
@@ -102,13 +106,6 @@ docker compose -f .\compose.yaml up -d
 
 ```
 docker builder prune --force
-```
-
-**Otherwise do this manually if you don't have Docker**
-
-*To play Migration (not necessary) in VS => Tools/Nuget Package Manager/ Package Manager Console.*
-```
-Add-Migration BackendClass -Project Infrastructure
 ```
 
 *In prod, when you setup the secrets in Github Action, don't forget to set the connection DB escape special characters in your connection strings to prevent them from being interpreted as command separators in the shell*
