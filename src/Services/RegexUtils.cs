@@ -62,7 +62,7 @@ namespace API.Services
             if (string.IsNullOrEmpty(city))
                 return false;
 
-            if (!CityRegex.IsMatch(city))
+            if (!this.CityRegex.IsMatch(city))
                 return false;
 
             return true;
@@ -91,7 +91,7 @@ namespace API.Services
             if (string.IsNullOrEmpty(dateString))
                 return false;
 
-            if (!DateRegex.IsMatch(dateString))
+            if (!this.DateRegex.IsMatch(dateString))
                 return false;
 
             if (date.Value > DateTime.Now)
@@ -113,7 +113,7 @@ namespace API.Services
             if (string.IsNullOrEmpty(Pseudo))
                 return false;
 
-            if (!PseudoRegex.IsMatch(Pseudo))
+            if (!this.PseudoRegex.IsMatch(Pseudo))
                 return false;
 
             return true;
@@ -124,7 +124,7 @@ namespace API.Services
             if (string.IsNullOrEmpty(Description))
                 return false;
 
-            if (!DescriptionRegex.IsMatch(Description))
+            if (!this.DescriptionRegex.IsMatch(Description))
                 return false;
 
             return true;
@@ -136,7 +136,7 @@ namespace API.Services
             if (string.IsNullOrEmpty(Message))
                 return false;
 
-            if (!MessageRegex.IsMatch(Message))
+            if (!this.MessageRegex.IsMatch(Message))
                 return false;
 
             return true;

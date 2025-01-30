@@ -10,6 +10,8 @@ using API.Features.Message;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseKestrel(options => options.AddServerHeader = false);
+
 builder.Configuration.AddJsonFile("EnvSecret.json", optional: false, reloadOnChange: true);
 builder.Services.Configure<SecretEnv>(builder.Configuration.GetSection("EnvSecret"));
 var envSecret = builder.Configuration.GetSection("EnvSecret").Get<SecretEnv>();
@@ -86,6 +88,6 @@ app.MapControllers();
 
 app.UseCors("web_site_Front");
 
-//app.MapHub<ChatHub>("/chatHub");
+app.MapHub<ChatHub>("/chatHub");
 
 await app.RunAsync();

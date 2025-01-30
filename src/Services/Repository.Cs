@@ -7,36 +7,36 @@ namespace API.Services;
 
 internal class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
-    protected readonly BackendDbContext _context;
+    protected readonly BackendDbContext context;
 
-    public Repository(BackendDbContext context)
+    public Repository(BackendDbContext _context)
     {
-        this._context = context;
+        this.context = _context;
     }
 
     public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await this._context.Set<TEntity>().ToListAsync(cancellationToken);
+        return await this.context.Set<TEntity>().ToListAsync(cancellationToken);
     }
 
-    public async Task<TEntity> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<TEntity> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
-        return await this._context.Set<TEntity>().FindAsync(id, cancellationToken);
+        return await this.context.Set<TEntity>().FindAsync(id, cancellationToken);
     }
 
     public async Task AddAsync(TEntity entity, CancellationToken cancellationToken)
     {
-        await this._context.Set<TEntity>().AddAsync(entity, cancellationToken);
+        await this.context.Set<TEntity>().AddAsync(entity, cancellationToken);
     }
 
     public void Delete(TEntity entity)
     {
-        this._context.Set<TEntity>().Remove(entity);
+        this.context.Set<TEntity>().Remove(entity);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
-        return await this._context.SaveChangesAsync(cancellationToken);
+        return await this.context.SaveChangesAsync(cancellationToken);
     }
 }
 
@@ -44,7 +44,7 @@ internal class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 
 public interface IRepository<TEntity> where TEntity : class
 {
-    Task<TEntity> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task<TEntity> GetByIdAsync(int id, CancellationToken cancellationToken);
     Task AddAsync(TEntity entity, CancellationToken cancellationToken);
     void Delete(TEntity entity);
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);

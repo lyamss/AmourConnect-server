@@ -39,6 +39,8 @@ namespace API.Extensions
             services.AddScoped<IConfigEmail, ConfigEmail>();
             services.AddScoped<IBodyEmail, BodyEmail>();
             services.AddScoped<IMessUtils, MessUtils>();
+            services.AddScoped<DataUser>();
+            services.AddSingleton<StringConfig>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddMediatR(cfg =>
             {

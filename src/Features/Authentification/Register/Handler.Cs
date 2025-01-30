@@ -14,6 +14,7 @@ internal sealed class RegisterHandler : IRequestHandler<CommandRegister , ApiRes
     private readonly IUserRepository _userRepository;
     private readonly IRepository<User> _repositoryU;
     private readonly ISendMail _sendMail;
+    private readonly StringConfig stringConfig;
 
     public RegisterHandler
     (
@@ -22,7 +23,8 @@ internal sealed class RegisterHandler : IRequestHandler<CommandRegister , ApiRes
         IRegexUtils regexUtils,
         IUserRepository userRepository,
         IRepository<User> repositoryU,
-        ISendMail sendMail
+        ISendMail sendMail,
+        StringConfig _stringConfig
     )
     {
         this._httpContextAccessor = httpContextAccessor;
@@ -31,15 +33,16 @@ internal sealed class RegisterHandler : IRequestHandler<CommandRegister , ApiRes
         this._userRepository = userRepository;
         this._repositoryU = repositoryU;
         this._sendMail = sendMail;
+        this.stringConfig = _stringConfig;
     }
 
     public async Task<ApiResponseDto> Handle(CommandRegister commandRegister, CancellationToken cancellationToken)
     {
 
-         var claims = this._jWTSessionUtils.GetClaimsFromCookieJWT(this._httpContextAccessor.HttpContext, this._jWTSessionUtils.NameCookieUserGoogle);
+         var claims = this._jWTSessionUtils.GetClaimsFromCookieJWT(this._httpContextAccessor.HttpContext, this.stringConfig.NameCookieUserGoogle);
 
-            string emailGoogle = claims?.FirstOrDefault(c => c.Type == "EmailGoogle")?.Value;
-            string userIdGoogle = claims?.FirstOrDefault(c => c.Type == "userIdGoogle")?.Value;
+            string emailGoogle = claims?.FirstOrDefault(c => c.Type == this.stringConfig.NameUserEmailGoogle)?.Value;
+            string userIdGoogle = claims?.FirstOrDefault(c => c.Type == this.stringConfig.NameUserIdGoogle)?.Value;
 
 
             if (string.IsNullOrEmpty(emailGoogle) || string.IsNullOrEmpty(userIdGoogle))

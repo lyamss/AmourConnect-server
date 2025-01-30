@@ -4,7 +4,7 @@ using System.Net.Mail;
 
 namespace API.Services.Email
 {
-    internal class ConfigEmail(IOptions<SecretEnv> SecretEnv) : IConfigEmail
+    internal sealed class ConfigEmail(IOptions<SecretEnv> SecretEnv) : IConfigEmail
     {
         public async Task configMail(string toEmail, string subject, string body)
         {
@@ -28,7 +28,7 @@ namespace API.Services.Email
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to send email to {toEmail}: {ex.Message}");
+                Console.WriteLine($"Failed to send email to {toEmail} => : {ex.Message}");
             }
         }
     }

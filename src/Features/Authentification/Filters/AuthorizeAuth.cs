@@ -3,7 +3,7 @@
 
 namespace API.Features.Authentification.Filters
 {
-    internal sealed class AuthorizeAuth(IAuthorizeAuthUseCase authorizeAuthUseCase) : Attribute, IAsyncAuthorizationFilter
+    internal sealed class AuthorizeAuth(IAuthorizeAuthUseCase authorizeAuthUseCase) : IAsyncAuthorizationFilter
     {
         private readonly IAuthorizeAuthUseCase _authorizeAuthUseCase = authorizeAuthUseCase;
 

@@ -9,11 +9,12 @@ using API.Features.Users;
 namespace API.Features.Authentification.Filters
 {
 
-    internal sealed class AuthorizeAuthUseCase(IHttpContextAccessor httpContextAccessor, IJWTSessionUtils jWTSessionUtils, IUserRepository userRepository) : IAuthorizeAuthUseCase
+    internal sealed class AuthorizeAuthUseCase(IHttpContextAccessor httpContextAccessor, IJWTSessionUtils jWTSessionUtils, IUserRepository userRepository, StringConfig _stringConfig) : IAuthorizeAuthUseCase
     {
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IJWTSessionUtils _jWTSessions = jWTSessionUtils;
         private readonly IUserRepository _userRepository = userRepository;
+        private readonly StringConfig stringConfig = _stringConfig;
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
@@ -25,7 +26,7 @@ namespace API.Features.Authentification.Filters
                 return;
             }
 
-            string cookieValue = this._jWTSessions.GetCookie(this._httpContextAccessor.HttpContext, this._jWTSessions.NameCookieUserConnected);
+            string cookieValue = this._jWTSessions.GetCookie(this._httpContextAccessor.HttpContext, this.stringConfig.NameCookieUserConnected);
 
             User user = await this._userRepository.GetUserWithCookieAsync(cookieValue, context.HttpContext.RequestAborted);
 
